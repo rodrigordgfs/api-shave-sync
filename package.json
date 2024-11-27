@@ -9,7 +9,8 @@
     "docker-down": "docker-compose down",
     "docker-remove-volumes": "docker-compose down -v",
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js"
+    "dev": "nodemon src/server.js",
+    "seed": "node prisma/seed.js"
   },
   "author": "",
   "license": "ISC",
