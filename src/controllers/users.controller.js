@@ -59,6 +59,30 @@ const register = async (request, reply) => {
   }
 };
 
+const login = async (request, reply) => {
+  try {
+    const schemaBody = z.object({
+      email: z.string().email({
+        message: "O e-mail é inválido",
+      }),
+      password: z.string().min(6, {
+        message: "A senha deve ter no mínimo 6 caracteres",
+      }).max(255, {
+        message: "A senha deve ter no máximo 255 caracteres",
+      }),
+    });
+
+    const { email, password } = schemaBody.parse(request.body);
+
+    const user = await userService.login(email, password);
+
+    reply.send(user);
+  } catch (error) {
+    handleErrorResponse(error, reply);
+  }
+}
+
 export default {
   register,
+  login
 };

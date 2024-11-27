@@ -1,4 +1,5 @@
 import { prisma } from "../libs/prisma.js";
+import constants from "../utils/constants.js";
 
 const logError = (error) => {
   console.error("Database Error:", error);
@@ -7,9 +8,37 @@ const logError = (error) => {
 
 const register = async (name, email, password) => {
   try {
+    const role = await prisma.role.findFirst({
+      where: {
+        name: constants.roles.client,
+      },
+    });
+
     const user = await prisma.user.create({
-      data: { name, email, password },
-      select: { id: true, name: true, email: true },
+      data: {
+        name,
+        email,
+        password,
+        UserRole: {
+          create: {
+            roleId: role.id,
+          },
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        UserRole: {
+          select: {
+            role: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+      },
     });
     return user;
   } catch (error) {
@@ -25,6 +54,16 @@ const getUserByEmail = async (email) => {
         id: true,
         name: true,
         email: true,
+        password: true,
+        UserRole: {
+          select: {
+            role: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
       },
     });
     return user;
