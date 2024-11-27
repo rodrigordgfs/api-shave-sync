@@ -1,0 +1,31 @@
+{
+  "name": "api-shave-sync",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "docker-up": "docker-compose up --build",
+    "docker-down": "docker-compose down",
+    "docker-remove-volumes": "docker-compose down -v",
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "bcrypt": "^5.1.1",
+    "date-fns": "^4.1.0",
+    "dotenv": "^16.4.5",
+    "fastify": "^5.1.0",
+    "http-status-code": "^2.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@fastify/cors": "^10.0.1",
+    "nodemon": "^3.1.7",
+    "prisma": "^5.22.0"
+  }
+}
