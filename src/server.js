@@ -1,8 +1,11 @@
 import fastify from "fastify";
 import cors from "@fastify/cors";
 import environment from "./config/envs.js";
+import routes from "./routes/index.js";
 
 const app = fastify();
+
+app.register(routes);
 
 app.register(cors, {
   origin: "*",

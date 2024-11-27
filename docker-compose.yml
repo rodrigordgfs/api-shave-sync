@@ -1,22 +1,22 @@
 version: "3.8"
 services:
-  api:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
-    environment:
-      - PORT=3000
-      - DATABASE_URL=postgresql://shinodalabs:shinodalabs@db:5432/shaveSync
-      - JWT_SECRET=9d44c3ec9267ceb4015553c8e25cdff10521b2edbb3b686b8a630293f9c3ca07
-    depends_on:
-      - db
-    volumes:
-      - .:/app
-      - /app/node_modules
-    networks:
-      - sheveSyncNetwork
+  # api:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - PORT=3000
+  #     - DATABASE_URL=postgresql://shinodalabs:shinodalabs@db:5432/shaveSync
+  #     - JWT_SECRET=9d44c3ec9267ceb4015553c8e25cdff10521b2edbb3b686b8a630293f9c3ca07
+  #   depends_on:
+  #     - db
+  #   volumes:
+  #     - .:/app
+  #     - /app/node_modules
+  #   networks:
+  #     - sheveSyncNetwork
 
   db:
     image: postgres:15
