@@ -1,8 +1,11 @@
 import { z } from "zod";
 import { StatusCodes } from "http-status-codes";
 import barbershopsService from "../services/barbershops.service.js";
+import barbershopPreferencesService from "../services/barbershopPreference.service.js";
 import servicesService from "../services/services.service.js";
+import employeeService from "../services/employee.service.js";
 import constants from "../utils/constants.js";
+import clientService from "../services/client.service.js";
 
 const handleErrorResponse = (error, reply) => {
   if (error instanceof z.ZodError) {
@@ -392,13 +395,14 @@ const patchBarbershopPreferences = async (request, reply) => {
     const { intervalOperation, closeTime, openTime, weekDaysOperation } =
       schemaBody.parse(request.body);
 
-    const barbershop = await barbershopsService.patchBarbershopPreferences(
-      id,
-      intervalOperation,
-      closeTime,
-      openTime,
-      weekDaysOperation
-    );
+    const barbershop =
+      await barbershopPreferencesService.patchBarbershopPreferences(
+        id,
+        intervalOperation,
+        closeTime,
+        openTime,
+        weekDaysOperation
+      );
 
     reply.code(StatusCodes.OK).send(barbershop);
   } catch (error) {
@@ -422,7 +426,7 @@ const getBarbershopClients = async (request, reply, fastify) => {
       return reply.code(StatusCodes.OK).send(cache);
     }
 
-    const clients = await barbershopsService.getBarbershopClients(id);
+    const clients = await clientService.getBarbershopClients(id);
     await fastify.cache.set(cacheKey, JSON.stringify(clients), { EX: 60 });
 
     reply.code(StatusCodes.OK).send(clients);
@@ -450,7 +454,7 @@ const getBarbershopClientById = async (request, reply, fastify) => {
       return reply.code(StatusCodes.OK).send(cache);
     }
 
-    const client = await barbershopsService.getBarbershopClientById(
+    const client = await clientService.getBarbershopClientById(
       idBarbershop,
       idClient
     );
@@ -508,7 +512,7 @@ const postBarbershopClient = async (request, reply) => {
       request.body
     );
 
-    const client = await barbershopsService.postBarbershopClient(
+    const client = await clientService.postBarbershopClient(
       id,
       name,
       phone,
@@ -572,7 +576,7 @@ const patchBarbershopClient = async (request, reply) => {
       request.body
     );
 
-    const client = await barbershopsService.patchBarbershopClient(
+    const client = await clientService.patchBarbershopClient(
       idBarbershop,
       idClient,
       name,
@@ -604,7 +608,7 @@ const getBarbershopEmployees = async (request, reply, fastify) => {
       return reply.code(StatusCodes.OK).send(cache);
     }
 
-    const employes = await barbershopsService.getBarbershopEmployees(id);
+    const employes = await employeeService.getBarbershopEmployees(id);
     await fastify.cache.set(cacheKey, JSON.stringify(employes), { EX: 60 });
 
     reply.code(StatusCodes.OK).send(employes);
@@ -632,7 +636,7 @@ const getBarbershopEmployeeById = async (request, reply, fastify) => {
       return reply.code(StatusCodes.OK).send(cache);
     }
 
-    const employee = await barbershopsService.getBarbershopEmployeeById(
+    const employee = await employeeService.getBarbershopEmployeeById(
       idBarbershop,
       idEmployee
     );
@@ -690,7 +694,7 @@ const postBarbershopEmployee = async (request, reply) => {
       request.body
     );
 
-    const employee = await barbershopsService.postBarbershopEmployee(
+    const employee = await employeeService.postBarbershopEmployee(
       id,
       name,
       phone,
@@ -754,7 +758,7 @@ const patchBarbershopEmployee = async (request, reply) => {
       request.body
     );
 
-    const employee = await barbershopsService.patchBarbershopEmployee(
+    const employee = await employeeService.patchBarbershopEmployee(
       idBarbershop,
       idEmployee,
       name,
