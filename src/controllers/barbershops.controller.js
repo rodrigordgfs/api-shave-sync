@@ -18,6 +18,7 @@ const handleErrorResponse = (error, reply) => {
     "Barbearia já existe": StatusCodes.CONFLICT,
     "Barbearia não encontrada": StatusCodes.NOT_FOUND,
     "Serviço não encontrado": StatusCodes.NOT_FOUND,
+    "Cliente não encontrado": StatusCodes.NOT_FOUND,
   };
 
   const statusCode =
@@ -238,7 +239,7 @@ const patchBarbershopService = async (request, reply) => {
   } catch (error) {
     handleErrorResponse(error, reply);
   }
-}
+};
 
 const postBarbershop = async (request, reply) => {
   try {
@@ -404,6 +405,188 @@ const patchBarbershopPreferences = async (request, reply) => {
   }
 };
 
+const getBarbershopClients = async (request, reply, fastify) => {
+  try {
+    const schemaParams = z.object({
+      id: z.string().uuid({
+        message: "O id deve ser um UUID",
+      }),
+    });
+
+    const { id } = schemaParams.parse(request.params);
+
+    const cacheKey = `barbershops:${id}:clients`;
+    const cache = await validateCache(fastify, cacheKey);
+    if (cache) {
+      return reply.code(StatusCodes.OK).send(cache);
+    }
+
+    const clients = await barbershopsService.getBarbershopClients(id);
+    await fastify.cache.set(cacheKey, JSON.stringify(clients), { EX: 60 });
+
+    reply.code(StatusCodes.OK).send(clients);
+  } catch (error) {
+    handleErrorResponse(error, reply);
+  }
+};
+
+const getBarbershopClientById = async (request, reply, fastify) => {
+  try {
+    const schemaParams = z.object({
+      idBarbershop: z.string().uuid({
+        message: "O id da barbearia deve ser um UUID",
+      }),
+      idClient: z.string().uuid({
+        message: "O id do cliente deve ser um UUID",
+      }),
+    });
+
+    const { idBarbershop, idClient } = schemaParams.parse(request.params);
+
+    const cacheKey = `barbershops:${idBarbershop}:clients:${idClient}`;
+    const cache = await validateCache(fastify, cacheKey);
+    if (cache) {
+      return reply.code(StatusCodes.OK).send(cache);
+    }
+
+    const client = await barbershopsService.getBarbershopClientById(
+      idBarbershop,
+      idClient
+    );
+    await fastify.cache.set(cacheKey, JSON.stringify(client), { EX: 60 });
+
+    reply.code(StatusCodes.OK).send(client);
+  } catch (error) {
+    handleErrorResponse(error, reply);
+  }
+};
+
+const postBarbershopClient = async (request, reply) => {
+  try {
+    const schemaParams = z.object({
+      id: z.string().uuid({
+        message: "O id deve ser um UUID",
+      }),
+    });
+
+    const schemaBody = z.object({
+      name: z
+        .string()
+        .min(3, {
+          message: "O nome deve ter no mínimo 3 caracteres",
+        })
+        .max(255, {
+          message: "O nome deve ter no máximo 255 caracteres",
+        }),
+      phone: z
+        .string()
+        .min(8, {
+          message: "O telefone deve ter no mínimo 8 caracteres",
+        })
+        .max(20, {
+          message: "O telefone deve ter no máximo 20 caracteres",
+        }),
+      email: z.string().email({
+        message: "O email é inválido",
+      }),
+      address: z
+        .string()
+        .min(3, {
+          message: "O endereço deve ter no mínimo 3 caracteres",
+        })
+        .max(255, {
+          message: "O endereço deve ter no máximo 255 caracteres",
+        }),
+      profilePicture: z.string().url({
+        message: "A foto de perfil é inválida",
+      }),
+    });
+
+    const { id } = schemaParams.parse(request.params);
+    const { name, phone, email, address, profilePicture } = schemaBody.parse(
+      request.body
+    );
+
+    const client = await barbershopsService.postBarbershopClient(
+      id,
+      name,
+      phone,
+      email,
+      address,
+      profilePicture
+    );
+
+    reply.code(StatusCodes.CREATED).send(client);
+  } catch (error) {
+    handleErrorResponse(error, reply);
+  }
+};
+
+const patchBarbershopClient = async (request, reply) => {
+  try {
+    const schemaParams = z.object({
+      idBarbershop: z.string().uuid({
+        message: "O id da barbearia deve ser um UUID",
+      }),
+      idClient: z.string().uuid({
+        message: "O id do cliente deve ser um UUID",
+      }),
+    });
+
+    const schemaBody = z.object({
+      name: z
+        .string()
+        .min(3, {
+          message: "O nome deve ter no mínimo 3 caracteres",
+        })
+        .max(255, {
+          message: "O nome deve ter no máximo 255 caracteres",
+        }),
+      phone: z
+        .string()
+        .min(8, {
+          message: "O telefone deve ter no mínimo 8 caracteres",
+        })
+        .max(20, {
+          message: "O telefone deve ter no máximo 20 caracteres",
+        }),
+      email: z.string().email({
+        message: "O email é inválido",
+      }),
+      address: z
+        .string()
+        .min(3, {
+          message: "O endereço deve ter no mínimo 3 caracteres",
+        })
+        .max(255, {
+          message: "O endereço deve ter no máximo 255 caracteres",
+        }),
+      profilePicture: z.string().url({
+        message: "A foto de perfil é inválida",
+      }),
+    });
+
+    const { idBarbershop, idClient } = schemaParams.parse(request.params);
+    const { name, phone, email, address, profilePicture } = schemaBody.parse(
+      request.body
+    );
+
+    const client = await barbershopsService.patchBarbershopClient(
+      idBarbershop,
+      idClient,
+      name,
+      phone,
+      email,
+      address,
+      profilePicture
+    );
+
+    reply.code(StatusCodes.OK).send(client);
+  } catch (error) {
+    handleErrorResponse(error, reply);
+  }
+};
+
 export default {
   getBarbershops,
   getBarbershopById,
@@ -414,4 +597,8 @@ export default {
   patchBarbershop,
   patchBarbershopPreferences,
   getBarbershopServiceById,
+  getBarbershopClients,
+  getBarbershopClientById,
+  postBarbershopClient,
+  patchBarbershopClient,
 };

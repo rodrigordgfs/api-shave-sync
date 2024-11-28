@@ -161,7 +161,7 @@ const postBarbershop = async (
       where: {
         name: constants.roles.owner,
       },
-    })
+    });
 
     const user = await prisma.userRole.update({
       where: {
@@ -260,6 +260,127 @@ const patchBarbershopPreferences = async (
   }
 };
 
+const getBarbershopClients = async (barbershopId) => {
+  try {
+    const clients = await prisma.clients.findMany({
+      where: {
+        barbershopId,
+      },
+      select: {
+        id: true,
+        name: true,
+        phone: true,
+        email: true,
+        address: true,
+        profilePicture: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+    return clients;
+  } catch (error) {
+    logError(error);
+  }
+};
+
+const getBarbershopClientById = async (barbershopId, clientId) => {
+  try {
+    const client = await prisma.clients.findUnique({
+      where: {
+        id: clientId,
+        barbershopId,
+      },
+      select: {
+        id: true,
+        name: true,
+        phone: true,
+        email: true,
+        address: true,
+        profilePicture: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+    return client;
+  } catch (error) {
+    logError(error);
+  }
+};
+
+const postBarbershopClient = async (
+  barbershopId,
+  name,
+  phone,
+  email,
+  address,
+  profilePicture
+) => {
+  try {
+    const client = await prisma.clients.create({
+      data: {
+        name,
+        phone,
+        email,
+        address,
+        profilePicture,
+        barbershopId,
+      },
+      select: {
+        id: true,
+        name: true,
+        phone: true,
+        email: true,
+        address: true,
+        profilePicture: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+    return client;
+  } catch (error) {
+    logError(error);
+  }
+};
+
+const patchBarbershopClient = async (
+  barbershopId,
+  clientId,
+  name,
+  phone,
+  email,
+  address,
+  profilePicture
+) => {
+  try {
+    const client = await prisma.clients.update({
+      where: {
+        id: clientId,
+        barbershopId,
+      },
+      data: {
+        name,
+        phone,
+        email,
+        address,
+        profilePicture,
+      },
+      select: {
+        id: true,
+        name: true,
+        phone: true,
+        email: true,
+        address: true,
+        profilePicture: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+    return client;
+  } catch (error) {
+    logError(error);
+  }
+};
+
 export default {
   getBarbershops,
   getBarbershopById,
@@ -267,4 +388,8 @@ export default {
   patchBarbershop,
   patchBarbershopPreferences,
   getBarbershopByUserId,
+  getBarbershopClients,
+  getBarbershopClientById,
+  postBarbershopClient,
+  patchBarbershopClient,
 };

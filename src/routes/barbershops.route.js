@@ -50,6 +50,28 @@ const barbershops = async (fastify) => {
     { preHandler: authMiddleware.validateToken },
     barbershopsController.patchBarbershopPreferences
   );
+  fastify.get(
+    "/barbershops/:id/clients",
+    { preHandler: authMiddleware.validateToken },
+    (request, reply) =>
+      barbershopsController.getBarbershopClients(request, reply, fastify)
+  );
+  fastify.get(
+    "/barbershops/:idBarbershop/clients/:idClient",
+    { preHandler: authMiddleware.validateToken },
+    (request, reply) =>
+      barbershopsController.getBarbershopClientById(request, reply, fastify)
+  );
+  fastify.post(
+    "/barbershops/:id/clients",
+    { preHandler: authMiddleware.validateToken },
+    barbershopsController.postBarbershopClient
+  );
+  fastify.patch(
+    "/barbershops/:idBarbershop/clients/:idClient",
+    { preHandler: authMiddleware.validateToken },
+    barbershopsController.patchBarbershopClient
+  );
 };
 
 export default barbershops;
