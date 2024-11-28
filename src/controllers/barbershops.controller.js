@@ -25,9 +25,24 @@ const handleErrorResponse = (error, reply) => {
   });
 };
 
-const getBarbershops = async (request, reply) => {
+const validateCache = async (fastify, cacheKey) => {
+  const cache = await fastify.cache.get(cacheKey);
+  if (cache) {
+    return JSON.parse(cache);
+  }
+};
+
+const getBarbershops = async (request, reply, fastify) => {
   try {
+    const cacheKey = "barbershops";
+    const cache = await validateCache(fastify, cacheKey);
+    if (cache) {
+      return reply.code(StatusCodes.OK).send(cache);
+    }
+
     const barbershops = await barbershopsService.getBarbershops();
+    await fastify.cache.set(cacheKey, JSON.stringify(barbershops), { EX: 60 });
+
     reply.code(StatusCodes.OK).send(barbershops);
   } catch (error) {
     handleErrorResponse(error, reply);

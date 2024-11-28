@@ -5,7 +5,8 @@ const barbershops = async (fastify) => {
   fastify.get(
     "/barbershops",
     { preHandler: authMiddleware.validateToken },
-    barbershopsController.getBarbershops
+    (request, reply) =>
+      barbershopsController.getBarbershops(request, reply, fastify)
   );
   fastify.get(
     "/barbershops/:id",

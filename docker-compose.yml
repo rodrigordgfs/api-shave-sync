@@ -1,22 +1,23 @@
 version: "3.8"
 services:
-  # api:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "3000:3000"
-  #   environment:
-  #     - PORT=3000
-  #     - DATABASE_URL=postgresql://shinodalabs:shinodalabs@db:5432/shaveSync
-  #     - JWT_SECRET=9d44c3ec9267ceb4015553c8e25cdff10521b2edbb3b686b8a630293f9c3ca07
-  #   depends_on:
-  #     - db
-  #   volumes:
-  #     - .:/app
-  #     - /app/node_modules
-  #   networks:
-  #     - sheveSyncNetwork
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - DATABASE_URL=postgresql://shinodalabs:shinodalabs@db:5432/shaveSync
+      - JWT_SECRET=9d44c3ec9267ceb4015553c8e25cdff10521b2edbb3b686b8a630293f9c3ca07
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - db
+    volumes:
+      - .:/app
+      - /app/node_modules
+    networks:
+      - shaveSyncNetwork
 
   db:
     image: postgres:15
@@ -30,7 +31,7 @@ services:
     ports:
       - "5432:5432"
     networks:
-      - sheveSyncNetwork
+      - shaveSyncNetwork
 
   adminer:
     image: adminer:4
@@ -38,12 +39,27 @@ services:
     ports:
       - "8080:8080"
     networks:
-      - sheveSyncNetwork
+      - shaveSyncNetwork
     depends_on:
       - db
 
+  redis:
+    image: redis:latest
+    container_name: redis_cache
+    ports:
+      - "6379:6379"
+    networks:
+      - shaveSyncNetwork
+
+  app:
+    build: .
+    depends_on:
+      - redis
+    networks:
+      - shaveSyncNetwork
+
 networks:
-  sheveSyncNetwork:
+  shaveSyncNetwork:
     driver: bridge
 
 volumes:
