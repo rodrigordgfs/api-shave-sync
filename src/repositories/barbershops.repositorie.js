@@ -381,6 +381,103 @@ const patchBarbershopClient = async (
   }
 };
 
+const getBarbershopEmployees = async (barbershopId) => {
+  try {
+    const employes = await prisma.employees.findMany({
+      where: {
+        barbershopId,
+      },
+      select: {
+        id: true,
+        name: true,
+        phone: true,
+        email: true,
+        address: true,
+        profilePicture: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+    return employes;
+  } catch (error) {
+    logError(error);
+  }
+};
+
+const postBarbershopEmployee = async (
+  barbershopId,
+  name,
+  phone,
+  email,
+  address,
+  profilePicture
+) => {
+  try {
+    const employee = await prisma.employees.create({
+      data: {
+        name,
+        phone,
+        email,
+        address,
+        profilePicture,
+        barbershopId,
+      },
+      select: {
+        id: true,
+        name: true,
+        phone: true,
+        email: true,
+        address: true,
+        profilePicture: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+    return employee;
+  } catch (error) {
+    logError(error);
+  }
+};
+
+const patchBarbershopEmployee = async (
+  barbershopId,
+  employeeId,
+  name,
+  phone,
+  email,
+  address,
+  profilePicture
+) => {
+  try {
+    const employee = await prisma.employees.update({
+      where: {
+        id: employeeId,
+        barbershopId,
+      },
+      data: {
+        name,
+        phone,
+        email,
+        address,
+        profilePicture,
+      },
+      select: {
+        id: true,
+        name: true,
+        phone: true,
+        email: true,
+        address: true,
+        profilePicture: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+    return employee;
+  } catch (error) {
+    logError(error);
+  }
+};
+
 export default {
   getBarbershops,
   getBarbershopById,
@@ -392,4 +489,7 @@ export default {
   getBarbershopClientById,
   postBarbershopClient,
   patchBarbershopClient,
+  getBarbershopEmployees,
+  postBarbershopEmployee,
+  patchBarbershopEmployee,
 };
