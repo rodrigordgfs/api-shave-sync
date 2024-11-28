@@ -18,6 +18,7 @@ enum RoleNames {
   ADMIN
   CLIENT
   EMPLOYEE
+  OWNER
 }
 
 enum WeekDays {
@@ -34,7 +35,7 @@ model User {
   id          String        @id @default(uuid())
   email       String        @unique
   name        String?
-  password    String?
+  password    String
   UserRole    UserRole[]
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
@@ -55,7 +56,7 @@ model Role {
 
 model UserRole {
   id        String   @id @default(uuid())
-  userId    String
+  userId    String   @unique
   roleId    String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

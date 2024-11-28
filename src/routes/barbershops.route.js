@@ -13,6 +13,28 @@ const barbershops = async (fastify) => {
     { preHandler: authMiddleware.validateToken },
     barbershopsController.getBarbershopById
   );
+  fastify.get(
+    "/barbershops/:id/services",
+    { preHandler: authMiddleware.validateToken },
+    (request, reply) =>
+      barbershopsController.getBarbershopServices(request, reply, fastify)
+  );
+  fastify.get(
+    "/barbershops/:idBarbershop/services/:idService",
+    { preHandler: authMiddleware.validateToken },
+    (request, reply) =>
+      barbershopsController.getBarbershopServiceById(request, reply, fastify)
+  );
+  fastify.post(
+    "/barbershops/:id/services",
+    { preHandler: authMiddleware.validateToken },
+    barbershopsController.postBarbershopService
+  );
+  fastify.patch(
+    "/barbershops/:idBarbershop/services/:idService",
+    { preHandler: authMiddleware.validateToken },
+    barbershopsController.patchBarbershopService
+  );
   fastify.post(
     "/barbershops",
     { preHandler: authMiddleware.validateToken },

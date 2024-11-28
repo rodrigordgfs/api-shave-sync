@@ -2,7 +2,8 @@ const constants = {
     roles: {
         admin: 'ADMIN',
         client: 'CLIENT',
-        employee: 'EMPLOYEE'
+        employee: 'EMPLOYEE',
+        owner: 'OWNER'
     },
     weekDays: {
         monday: 'MONDAY',

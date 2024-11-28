@@ -156,6 +156,22 @@ const postBarbershop = async (
         updatedAt: true,
       },
     });
+
+    const ownerRole = await prisma.role.findUnique({
+      where: {
+        name: constants.roles.owner,
+      },
+    })
+
+    const user = await prisma.userRole.update({
+      where: {
+        userId,
+      },
+      data: {
+        roleId: ownerRole.id,
+      },
+    });
+
     return barbershop;
   } catch (error) {
     logError(error);

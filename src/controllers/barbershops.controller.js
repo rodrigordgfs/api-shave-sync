@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { StatusCodes } from "http-status-codes";
 import barbershopsService from "../services/barbershops.service.js";
+import servicesService from "../services/services.service.js";
 import constants from "../utils/constants.js";
 
 const handleErrorResponse = (error, reply) => {
@@ -16,6 +17,7 @@ const handleErrorResponse = (error, reply) => {
   const errorMessages = {
     "Barbearia já existe": StatusCodes.CONFLICT,
     "Barbearia não encontrada": StatusCodes.NOT_FOUND,
+    "Serviço não encontrado": StatusCodes.NOT_FOUND,
   };
 
   const statusCode =
@@ -59,13 +61,184 @@ const getBarbershopById = async (request, reply) => {
 
     const { id } = schemaParams.parse(request.params);
 
+    const cacheKey = `barbershops:${id}`;
+    const cache = await validateCache(fastify, cacheKey);
+    if (cache) {
+      return reply.code(StatusCodes.OK).send(cache);
+    }
+
     const barbershop = await barbershopsService.getBarbershopById(id);
+    await fastify.cache.set(cacheKey, JSON.stringify(barbershop), { EX: 60 });
 
     reply.code(StatusCodes.OK).send(barbershop);
   } catch (error) {
     handleErrorResponse(error, reply);
   }
 };
+
+const getBarbershopServices = async (request, reply, fastify) => {
+  const schemaParams = z.object({
+    id: z.string().uuid({
+      message: "O id deve ser um UUID",
+    }),
+  });
+
+  const { id } = schemaParams.parse(request.params);
+
+  const cacheKey = `barbershops:${id}:services`;
+  const cache = await validateCache(fastify, cacheKey);
+  if (cache) {
+    return reply.code(StatusCodes.OK).send(cache);
+  }
+
+  const services = await servicesService.getServicesByBarbershopId(id);
+  await fastify.cache.set(cacheKey, JSON.stringify(services), { EX: 60 });
+
+  reply.code(StatusCodes.OK).send(services);
+};
+
+const getBarbershopServiceById = async (request, reply, fastify) => {
+  const schemaParams = z.object({
+    idBarbershop: z.string().uuid({
+      message: "O id deve ser um UUID",
+    }),
+    idService: z.string().uuid({
+      message: "O id deve ser um UUID",
+    }),
+  });
+
+  const { idBarbershop, idService } = schemaParams.parse(request.params);
+
+  const cacheKey = `barbershops:${idBarbershop}:services:${idService}`;
+  const cache = await validateCache(fastify, cacheKey);
+  if (cache) {
+    return reply.code(StatusCodes.OK).send(cache);
+  }
+
+  const service = await servicesService.getServiceByBarbershopById(
+    idBarbershop,
+    idService
+  );
+  await fastify.cache.set(cacheKey, JSON.stringify(service), { EX: 60 });
+
+  reply.code(StatusCodes.OK).send(service);
+};
+
+const postBarbershopService = async (request, reply) => {
+  try {
+    const schemaParams = z.object({
+      id: z.string().uuid({
+        message: "O id deve ser um UUID",
+      }),
+    });
+
+    const schemaBody = z.object({
+      name: z
+        .string()
+        .min(3, {
+          message: "O nome deve ter no mínimo 3 caracteres",
+        })
+        .max(255, {
+          message: "O nome deve ter no máximo 255 caracteres",
+        }),
+      description: z
+        .string()
+        .min(3, {
+          message: "A descrição deve ter no mínimo 3 caracteres",
+        })
+        .max(255, {
+          message: "A descrição deve ter no máximo 255 caracteres",
+        }),
+      image: z.string().url({
+        message: "A imagem é inválida",
+      }),
+      price: z.number().min(0, {
+        message: "O preço deve ser maior que 0",
+      }),
+      duration: z.number().min(1, {
+        message: "A duração deve ser maior que 0",
+      }),
+    });
+
+    const { id } = schemaParams.parse(request.params);
+    const { name, description, price, duration, image } = schemaBody.parse(
+      request.body
+    );
+
+    const service = await servicesService.postBarberhopService(
+      id,
+      name,
+      description,
+      price,
+      duration,
+      image
+    );
+
+    reply.code(StatusCodes.CREATED).send(service);
+  } catch (error) {
+    handleErrorResponse(error, reply);
+  }
+};
+
+const patchBarbershopService = async (request, reply) => {
+  try {
+    const schemaParams = z.object({
+      idBarbershop: z.string().uuid({
+        message: "O id da barbearia deve ser um UUID",
+      }),
+      idService: z.string().uuid({
+        message: "O id do serviço deve ser um UUID",
+      }),
+    });
+
+    const schemaBody = z.object({
+      name: z
+        .string()
+        .min(3, {
+          message: "O nome deve ter no mínimo 3 caracteres",
+        })
+        .max(255, {
+          message: "O nome deve ter no máximo 255 caracteres",
+        }),
+      description: z
+        .string()
+        .min(3, {
+          message: "A descrição deve ter no mínimo 3 caracteres",
+        })
+        .max(255, {
+          message: "A descrição deve ter no máximo 255 caracteres",
+        }),
+      image: z.string().url({
+        message: "A imagem é inválida",
+      }),
+      price: z.number().min(0, {
+        message: "O preço deve ser maior que 0",
+      }),
+      duration: z.number().min(1, {
+        message: "A duração deve ser maior que 0",
+      }),
+    });
+
+    const { idBarbershop, idService } = schemaParams.parse(request.params);
+    const { name, description, price, duration, image } = schemaBody.parse(
+      request.body
+    );
+
+    const service = await servicesService.patchBarberhopService(
+      idBarbershop,
+      idService,
+      name,
+      description,
+      price,
+      duration,
+      image
+    );
+
+    reply.code(StatusCodes.OK).send(service);
+  } catch (error) {
+    handleErrorResponse(error, reply);
+  }
+}
 
 const postBarbershop = async (request, reply) => {
   try {
@@ -234,7 +407,11 @@ const patchBarbershopPreferences = async (request, reply) => {
 export default {
   getBarbershops,
   getBarbershopById,
+  getBarbershopServices,
+  postBarbershopService,
+  patchBarbershopService,
   postBarbershop,
   patchBarbershop,
   patchBarbershopPreferences,
+  getBarbershopServiceById,
 };

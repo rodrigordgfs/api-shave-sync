@@ -17,8 +17,8 @@ async function main() {
 
   // Criando 10 Roles
   const roles = [];
-  const roleNames = ["ADMIN", "EMPLOYEE", "CLIENT"];
-  for (let i = 1; i <= 3; i++) {
+  const roleNames = ["ADMIN", "EMPLOYEE", "CLIENT", "OWNER"];
+  for (let i = 1; i <= 4; i++) {
     const role = await prisma.role.create({
       data: {
         name: roleNames[i - 1],
