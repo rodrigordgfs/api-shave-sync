@@ -178,8 +178,27 @@ const getAppointmentById = async (appointmentId) => {
   }
 };
 
+const patchAppointment = async (appointmentId, status) => {
+  try {
+    const appointment = await appointmentsRespositorie.getAppointmentById(
+      appointmentId
+    );
+    if (!appointment) {
+      throw new AppError("Agendamento não encontrado");
+    }
+
+    const updatedAppointment =
+      await appointmentsRespositorie.patchAppointment(appointmentId, status);
+
+    return updatedAppointment;
+  } catch (error) {
+    throw new AppError(error.message);
+  }
+};
+
 export default {
   postAppointment,
   getAppointments,
   getAppointmentById,
+  patchAppointment
 };

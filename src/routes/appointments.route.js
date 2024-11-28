@@ -21,6 +21,11 @@ const appointments = async (fastify) => {
       appointmentsController.getAppointmentById(request, reply, fastify);
     }
   );
+  fastify.patch(
+    "/appointments/:id",
+    { preHandler: authMiddleware.validateToken },
+    appointmentsController.patchAppointment
+  );
 };
 
 export default appointments;

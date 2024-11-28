@@ -242,10 +242,66 @@ const getAppointmentById = async (appointmentId) => {
   }
 };
 
+const patchAppointment = async (appointmentId, status) => {
+  try {
+    const appointment = await prisma.appointments.update({
+      where: {
+        id: appointmentId,
+      },
+      data: {
+        status,
+      },
+      select: {
+        id: true,
+        barbershop: {
+          select: {
+            id: true,
+            name: true,
+            profilePicture: true,
+          },
+        },
+        service: {
+          select: {
+            id: true,
+            name: true,
+            duration: true,
+            price: true,
+            image: true,
+          },
+        },
+        employee: {
+          select: {
+            id: true,
+            name: true,
+            profilePicture: true,
+          },
+        },
+        client: {
+          select: {
+            id: true,
+            name: true,
+            profilePicture: true,
+          },
+        },
+        dateTime: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    return appointment;
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("An unexpected error occurred. Please try again.");
+  }
+};
+
 export default {
   getAppointmentsByEmployee,
   getAppointmentsByClient,
   postAppointment,
   getAppointmentsByBarbershopAndDate,
   getAppointmentById,
+  patchAppointment,
 };

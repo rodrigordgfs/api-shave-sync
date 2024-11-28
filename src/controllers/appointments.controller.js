@@ -6,10 +6,7 @@ import constants from "../utils/constants.js";
 const handleErrorResponse = (error, reply) => {
   if (error instanceof z.ZodError) {
     return reply.code(StatusCodes.BAD_REQUEST).send({
-      error: error.errors.map(({ message, path }) => ({
-        message,
-        field: path[0],
-      })),
+      message: error.errors[0].message,
     });
   }
 
@@ -81,6 +78,37 @@ const postAppointment = async (request, reply) => {
   }
 };
 
+const patchAppointment = async (request, reply) => {
+  try {
+    const schemaParams = z.object({
+      id: z.string().uuid({
+        message: "O id do agendamento deve ser um UUID",
+      }),
+    });
+
+    const schemaBody = z.object({
+      status: z.enum(
+        [
+          constants.StatusAppointment.pending,
+          constants.StatusAppointment.confirmed,
+          constants.StatusAppointment.cancelled,
+          constants.StatusAppointment.completed,
+        ],
+        { message: "O status do agendamento é inválido" }
+      ),
+    });
+
+    const { id } = schemaParams.parse(request.params);
+    const { status } = schemaBody.parse(request.body);
+
+    const appointment = await appointmentService.patchAppointment(id, status);
+
+    reply.send(appointment);
+  } catch (error) {
+    handleErrorResponse(error, reply);
+  }
+};
+
 const getAppointments = async (request, reply, fastify) => {
   try {
     const schemaQuery = z.object({
@@ -146,4 +174,5 @@ export default {
   postAppointment,
   getAppointments,
   getAppointmentById,
+  patchAppointment,
 };

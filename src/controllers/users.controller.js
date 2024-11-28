@@ -5,10 +5,7 @@ import userService from '../services/users.service.js';
 const handleErrorResponse = (error, reply) => {
   if (error instanceof z.ZodError) {
     return reply.code(StatusCodes.BAD_REQUEST).send({
-      error: error.errors.map(({ message, path }) => ({
-        message,
-        field: path[0],
-      })),
+      message: error.errors[0].message,
     });
   }
 
@@ -18,8 +15,7 @@ const handleErrorResponse = (error, reply) => {
     "Usuário não encontrado": StatusCodes.NOT_FOUND,
   };
 
-  const statusCode =
-    errorMessages[error.message] || StatusCodes.INTERNAL_SERVER_ERROR;
+  const statusCode = errorMessages[error.message] || StatusCodes.INTERNAL_SERVER_ERROR;
   reply.code(statusCode).send({
     error: error.message || "Ocorreu um erro interno",
   });
