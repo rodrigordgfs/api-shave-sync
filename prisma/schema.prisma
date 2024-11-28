@@ -20,6 +20,16 @@ enum RoleNames {
   EMPLOYEE
 }
 
+enum WeekDays {
+  SUNDAY
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+}
+
 model User {
   id          String        @id @default(uuid())
   email       String        @unique
@@ -76,11 +86,11 @@ model Barbershops {
 
 model BarbershopPreferences {
   id                String      @id @default(uuid())
-  barbershopId      String
-  openTime          String
-  closeTime         String
-  weekDaysOperation String[]
-  intervalOperation Int
+  barbershopId      String      @unique
+  openTime          String?
+  closeTime         String?
+  weekDaysOperation WeekDays[]  @default([])
+  intervalOperation Int?
   createdAt         DateTime    @default(now())
   updatedAt         DateTime    @updatedAt
   barbershop        Barbershops @relation(fields: [barbershopId], references: [id])
