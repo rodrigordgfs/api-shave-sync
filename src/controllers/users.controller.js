@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { StatusCodes } from "http-status-codes";
-import userService from '../services/user.service.js';
+import userService from '../services/users.service.js';
 
 const handleErrorResponse = (error, reply) => {
   if (error instanceof z.ZodError) {

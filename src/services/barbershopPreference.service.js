@@ -1,4 +1,4 @@
-import barbershopsRespositorie from "../repositories/barbershops.repositorie.js";
+import barbershopPreferencesRespositorie from "../repositories/barbershopPreferences.repositorie.js";
 import employeeRespositorie from "../repositories/employees.repository.js";
 import AppError from "../utils/error.js";
 
@@ -18,7 +18,7 @@ const patchBarbershopPreferences = async (
       throw new AppError("Barbearia não encontrada");
     }
 
-    const barbershop = await barbershopsRespositorie.patchBarbershopPreferences(
+    const barbershop = await barbershopPreferencesRespositorie.patchBarbershopPreferences(
       barbershopId,
       openTime,
       closeTime,

@@ -72,7 +72,34 @@ const getUserByEmail = async (email) => {
   }
 };
 
+const getUserById = async (id) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        password: true,
+        UserRole: {
+          select: {
+            role: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    return user;
+  } catch (error) {
+    logError(error);
+  }
+};
+
 export default {
   register,
   getUserByEmail,
+  getUserById
 };

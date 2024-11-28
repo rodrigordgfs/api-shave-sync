@@ -1,4 +1,5 @@
 import barbershopsRespositorie from "../repositories/barbershops.repositorie.js";
+import userRepositorie from "../repositories/user.repositorie.js";
 import clientRespositorie from "../repositories/clients.repository.js";
 import employeeRespositorie from "../repositories/employees.repository.js";
 import AppError from "../utils/error.js";
@@ -35,6 +36,11 @@ const postBarbershop = async (
   userId
 ) => {
   try {
+    const userExists = await userRepositorie.getUserById(userId);
+    if (!userExists) {
+      throw new AppError("Usuário não encontrado");
+    }
+
     const barbershop = await barbershopsRespositorie.postBarbershop(
       name,
       address,

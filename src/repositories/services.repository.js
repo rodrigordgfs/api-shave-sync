@@ -7,6 +7,29 @@ const logError = (error) => {
   throw new Error("An unexpected error occurred. Please try again.");
 };
 
+const getServiceById = async (serviceId) => {
+  try {
+    const service = await prisma.services.findFirst({
+      where: {
+        id: serviceId,
+      },
+      select: {
+        id: true,
+        name: true,
+        price: true,
+        duration: true,
+        image: true,
+        description: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+    return service;
+  } catch (error) {
+    logError(error);
+  }
+}
+
 const getServicesByBarbershopId = async (barbershopId) => {
   try {
     const services = await prisma.services.findMany({
@@ -128,6 +151,7 @@ const patchBarberhopService = async (
 }
 
 export default {
+  getServiceById,
   getServicesByBarbershopId,
   getServiceByBarbershopById,
   postBarberhopService,
